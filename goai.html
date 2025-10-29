@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>圍棋 AI</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    background-color: #f5deb3;
+  }
+  canvas {
+    background-color: #F0D9B5;
+    width: 90vmin; height: 90vmin;
+    touch-action: none;
+  }
+  #controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+    font-family: "Noto Sans TC", sans-serif;
+    justify-content: center;
+  }
+  #status {
+    font-family: "Noto Sans TC", sans-serif;
+    font-size: 1.1em;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+<canvas id="goBoard"></canvas>
+<div id="controls">
+  <label>AI 難度：
+    <select id="aiLevel">
+      <option value="easy">初級</option>
+      <option value="medium" selected>中級</option>
+      <option value="pro">職業級</option>
+    </select>
+  </label>
+  <button onclick="resetGame()">重新開始</button>
+  <button onclick="checkWinner()">🧮 計算勝負</button>
+</div>
+<div id="status">🟢 黑棋下子中</div>
+
+<script>
+const BOARD_SIZE = 19;
+let canvas = document.getElementById('goBoard');
+let ctx = canvas.getContext('2d');
+let statusText = document.getElementById('status');
+let aiLevel = document.getElementById('aiLevel');
+let board = Array.from({length: BOARD_SIZE},()=>Array(BOARD_SIZE).fill(0));
+let CELL_SIZE, STONE_RADIUS;
+let isAIMoving = false;
+let lastMove = null; // 最後落子位置
+
+function resizeCanvas(){
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+  CELL_SIZE = canvas.width / BOARD_SIZE;
+  STONE_RADIUS = CELL_SIZE/2 - 2;
+  drawBoard();
+}
+window.addEventListener('resize', resizeCanvas);
+
+// === 棋盤繪製 ===
+function drawBoard(){
+  ctx.clearRect(0,0,canvas.width,canvas.height); 
+
+  // 畫棋盤線
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
+  for(let i=0;i<BOARD_SIZE;i++){
+    ctx.beginPath();
+    ctx.moveTo(CELL_SIZE/2, CELL_SIZE/2+i*CELL_SIZE);
+    ctx.lineTo(CELL_SIZE/2+(BOARD_SIZE-1)*CELL_SIZE, CELL_SIZE/2+i*CELL_SIZE);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(CELL_SIZE/2+i*CELL_SIZE, CELL_SIZE/2);
+    ctx.lineTo(CELL_SIZE/2+i*CELL_SIZE, CELL_SIZE/2+(BOARD_SIZE-1)*CELL_SIZE);
+    ctx.stroke();
+  }
+
+  // 畫星位
+  let stars=[3,9,15];
+  ctx.fillStyle = '#000';
+  for(let i of stars){
+    for(let j of stars){
+      ctx.beginPath();
+      ctx.arc(CELL_SIZE/2+i*CELL_SIZE, CELL_SIZE/2+j*CELL_SIZE,3,0,2*Math.PI);
+      ctx.fill();
+    }
+  }
+
+  // 畫棋子
+  for(let r=0;r<BOARD_SIZE;r++){
+    for(let c=0;c<BOARD_SIZE;c++){
+      if(board[r][c]!==0){
+        ctx.beginPath();
+        ctx.arc(CELL_SIZE/2+c*CELL_SIZE, CELL_SIZE/2+r*CELL_SIZE, STONE_RADIUS,0,2*Math.PI);
+        ctx.fillStyle = board[r][c]===1?'black':'white';
+        ctx.fill();
+      }
+    }
+  }
+
+  // 畫最後落子黃色邊框
+  if(lastMove){
+    let [lr, lc] = lastMove;
+    ctx.beginPath();
+    ctx.arc(CELL_SIZE/2 + lc*CELL_SIZE, CELL_SIZE/2 + lr*CELL_SIZE, STONE_RADIUS + 2, 0, 2*Math.PI);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'yellow';
+    ctx.stroke();
+  }
+}
+
+// === 棋理 ===
+function getGroup(r,c,color,visited=new Set()){
+  let key=r+','+c;
+  if(visited.has(key)) return [];
+  visited.add(key);
+  let group=[[r,c]];
+  let dirs=[[-1,0],[1,0],[0,-1],[0,1]];
+  for(let [dr,dc] of dirs){
+    let nr=r+dr,nc=c+dc;
+    if(nr<0||nr>=BOARD_SIZE||nc<0||nc>=BOARD_SIZE) continue;
+    if(board[nr][nc]===color){
+      group = group.concat(getGroup(nr,nc,color,visited));
+    }
+  }
+  return group;
+}
+
+function hasLiberties(r,c,color){
+  let group=getGroup(r,c,color);
+  let dirs=[[-1,0],[1,0],[0,-1],[0,1]];
+  for(let [gr,gc] of group){
+    for(let [dr,dc] of dirs){
+      let nr=gr+dr,nc=gc+dc;
+      if(nr<0||nr>=BOARD_SIZE||nc<0||nc>=BOARD_SIZE) continue;
+      if(board[nr][nc]===0) return true;
+    }
+  }
+  return false;
+}
+
+function removeDead(color){
+  for(let r=0;r<BOARD_SIZE;r++){
+    for(let c=0;c<BOARD_SIZE;c++){
+      if(board[r][c]===color && !hasLiberties(r,c,color)){
+        let group=getGroup(r,c,color);
+        for(let [gr,gc] of group) board[gr][gc]=0;
+      }
+    }
+  }
+}
+
+function placeStone(r,c,color){
+  if(board[r][c]!==0) return false;
+  board[r][c]=color;
+  removeDead(3-color);
+  if(!hasLiberties(r,c,color)){
+    board[r][c]=0;
+    return false;
+  }
+  lastMove = [r,c]; // 更新最後落子
+  return true;
+}
+
+// === 評估 + 模擬 ===
+function evaluateBoard(color){
+  let score=0;
+  for(let r=0;r<BOARD_SIZE;r++){
+    for(let c=0;c<BOARD_SIZE;c++){
+      if(board[r][c]===color) score+=1;
+      else if(board[r][c]===3-color) score-=1;
+    }
+  }
+  for(let r=0;r<BOARD_SIZE;r++){
+    for(let c=0;c<BOARD_SIZE;c++){
+      if(board[r][c]!==0) continue;
+      let neighbors=new Set();
+      let dirs=[[-1,0],[1,0],[0,-1],[0,1]];
+      for(let [dr,dc] of dirs){
+        let nr=r+dr,nc=c+dc;
+        if(nr<0||nr>=BOARD_SIZE||nc<0||nc>=BOARD_SIZE) continue;
+        if(board[nr][nc]!==0) neighbors.add(board[nr][nc]);
+      }
+      if(neighbors.size===1){
+        let owner=[...neighbors][0];
+        score += owner===color?0.2:-0.2;
+      }
+    }
+  }
+  return score;
+}
+
+function randomMove(color){
+  let empties=[];
+  for(let r=0;r<BOARD_SIZE;r++){
+    for(let c=0;c<BOARD_SIZE;c++){
+      if(board[r][c]===0) empties.push([r,c]);
+    }
+  }
+  while(empties.length>0){
+    let [r,c]=empties.splice(Math.floor(Math.random()*empties.length),1)[0];
+    if(placeStone(r,c,color)) return;
+  }
+}
+
+function simulatePlayout(startColor,maxMoves=20){
+  let backup=board.map(row=>[...row]);
+  let color=startColor;
+  for(let i=0;i<maxMoves;i++){
+    randomMove(color);
+    color=3-color;
+  }
+  let result=evaluateBoard(2);
+  board=backup;
+  return result;
+}
+
+// === AI 思考 ===
+async function aiMove(){
+  if(isAIMoving) return;
+  isAIMoving=true;
+  statusText.textContent="💭 白棋思考中...";
+
+  let level=aiLevel.value;
+  let timeLimit = level==='easy'?500 : level==='medium'?1500 : 4000;
+
+  let bestScore=-Infinity, bestMove=null;
+  const startTime=performance.now();
+
+  let candidates=[];
+  for(let r=0;r<BOARD_SIZE;r++){
+    for(let c=0;c<BOARD_SIZE;c++){
+      if(board[r][c]!==0) continue;
+      for(let dr=-2;dr<=2;dr++){
+        for(let dc=-2;dc<=2;dc++){
+          let nr=r+dr,nc=c+dc;
+          if(nr>=0&&nr<BOARD_SIZE&&nc>=0&&nc<BOARD_SIZE&&board[nr][nc]!==0){
+            candidates.push([r,c]);
+            break;
+          }
+        }
+      }
+    }
+  }
+  if(candidates.length===0) candidates=[[9,9]];
+
+  let i=0;
+  while(performance.now()-startTime<timeLimit){
+    let [r,c]=candidates[i % candidates.length];
+    let backup=board.map(row=>[...row]);
+    if(placeStone(r,c,2)){
+      removeDead(1);
+      let result=simulatePlayout(1);
+      if(result>bestScore){
+        bestScore=result;
+        bestMove=[r,c];
+      }
+    }
+    board=backup;
+    i++;
+    if(i%60===0) await new Promise(res=>setTimeout(res,1));
+  }
+
+  if(bestMove){
+    placeStone(bestMove[0],bestMove[1],2);
+    drawBoard();
+  }
+  statusText.textContent="🟢 黑棋下子中";
+  isAIMoving=false;
+}
+
+// === 勝負判定 ===
+function checkWinner(){
+  let black=0, white=0;
+  for(let r=0;r<BOARD_SIZE;r++){
+    for(let c=0;c<BOARD_SIZE;c++){
+      if(board[r][c]===1) black++;
+      else if(board[r][c]===2) white++;
+      else {
+        let neighbors=new Set();
+        let dirs=[[-1,0],[1,0],[0,-1],[0,1]];
+        for(let [dr,dc] of dirs){
+          let nr=r+dr,nc=c+dc;
+          if(nr<0||nr>=BOARD_SIZE||nc<0||nc>=BOARD_SIZE) continue;
+          if(board[nr][nc]!==0) neighbors.add(board[nr][nc]);
+        }
+        if(neighbors.size===1){
+          let owner=[...neighbors][0];
+          if(owner===1) black+=0.5;
+          else if(owner===2) white+=0.5;
+        }
+      }
+    }
+  }
+
+  let winner;
+  if(black>white) winner=`⚫ 黑棋勝（${(black-white).toFixed(1)}目）`;
+  else if(white>black) winner=`⚪ 白棋勝（${(white-black).toFixed(1)}目）`;
+  else winner="🤝 平手！";
+
+  statusText.textContent = `🧮 黑=${black.toFixed(1)} 白=${white.toFixed(1)} → ${winner}`;
+}
+
+// === 玩家 ===
+function getCellFromEvent(e){
+  let rect=canvas.getBoundingClientRect();
+  let x=e.clientX-rect.left, y=e.clientY-rect.top;
+  let col=Math.round((x-CELL_SIZE/2)/CELL_SIZE);
+  let row=Math.round((y-CELL_SIZE/2)/CELL_SIZE);
+  return [row,col];
+}
+
+function playerMove(e){
+  if(isAIMoving) return;
+  let [r,c]=getCellFromEvent(e);
+  if(placeStone(r,c,1)){
+    drawBoard();
+    setTimeout(aiMove,200);
+  }
+}
+
+function resetGame(){
+  board = Array.from({length: BOARD_SIZE},()=>Array(BOARD_SIZE).fill(0));
+  lastMove = null;
+  drawBoard();
+  statusText.textContent="🟢 黑棋下子中";
+  isAIMoving=false;
+}
+
+canvas.addEventListener('click',playerMove);
+canvas.addEventListener('touchstart',(e)=>{
+  e.preventDefault();
+  playerMove(e.touches[0]);
+});
+
+resizeCanvas();
+</script>
+</body>
+</html>
