@@ -1,78 +1,234 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <title>學習資源總整理</title>
-    <style>
-        body {
-            font-family: "Microsoft JhengHei", sans-serif;
-            line-height: 1.6;
-            background-color: #f9f9f9;
-            color: #333;
-            padding: 20px;
-        }
-        h1 {
-            color: #005599;
-        }
-        h2 {
-            color: #0077aa;
-            margin-top: 30px;
-        }
-        ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        li {
-            margin: 10px 0;
-        }
-        a {
-            text-decoration: none;
-            color: #0066cc;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>學習資源總整理</title>
+<style>
+    body {
+        font-family: "Microsoft JhengHei", sans-serif;
+        margin: 0;
+        background-color: #f9f9f9;
+        color: #333;
+        display: flex;
+        transition: background 0.3s;
+    }
+
+    /* 左側懸浮選單 */
+    .sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 180px;
+        height: calc(100vh - 60px);
+        display: flex;
+        flex-direction: column;
+        padding-top: 20px;
+        z-index: 1000;
+        overflow-y: auto;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+        border-radius: 0 20px 20px 0;
+    }
+
+    .sidebar h2 {
+        font-size: 16px;
+        margin: 0;
+        padding: 12px 20px;
+        cursor: pointer;
+        color: #000;
+        border-radius: 0 20px 20px 0;
+        margin-bottom: 5px;
+        transition: transform 0.3s, color 0.3s, background 0.3s;
+    }
+
+    .sidebar h2:hover {
+        transform: scale(1.05);
+        color: #333;
+    }
+
+    /* 淡色漸層 */
+    .red { background: linear-gradient(90deg, rgba(255,205,210,0.7), rgba(255,138,128,0.7)); }
+    .orange { background: linear-gradient(90deg, rgba(255,224,178,0.7), rgba(255,183,77,0.7)); }
+    .yellow { background: linear-gradient(90deg, rgba(255,249,196,0.7), rgba(255,241,118,0.7)); }
+    .green { background: linear-gradient(90deg, rgba(220,237,200,0.7), rgba(174,213,129,0.7)); }
+    .blue { background: linear-gradient(90deg, rgba(187,222,251,0.7), rgba(100,181,246,0.7)); }
+    .purple { background: linear-gradient(90deg, rgba(225,190,231,0.7), rgba(186,104,200,0.7)); }
+
+    /* 固定頂部標題 */
+    header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        padding-left: 200px;
+        z-index: 999;
+        box-shadow: none;
+    }
+
+    header h1 {
+        color: #005599;
+        margin: 0;
+        font-size: 24px;
+    }
+
+    /* 右側內容 */
+    .content {
+        margin-left: 200px;
+        margin-top: 60px;
+        padding: 20px;
+        flex: 1;
+        transition: background 0.3s;
+        padding-bottom: 80px; /* 給固定footer留空間 */
+    }
+
+    .content.dimmed {
+        background-color: rgba(249, 249, 249, 0.6);
+    }
+
+    .content-section {
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateX(50px);
+        transition: all 0.5s ease;
+    }
+
+    .content-section.active {
+        max-height: 1000px;
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    li {
+        margin: 10px 0;
+    }
+
+    a {
+        text-decoration: none;
+        color: #0066cc;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    /* 固定底部版權文字 */
+    footer {
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #777;
+        font-size: 14px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 5px 20px;
+        border-radius: 10px;
+        backdrop-filter: blur(6px);
+        white-space: nowrap; /* ✅ 不換行 */
+    }
+</style>
 </head>
 <body>
-    <h1>學習資源總整理</h1>
 
-    <h2>康軒小一</h2>
-    <ul>
-        <li><a href="https://guaelves.github.io/KXV/KXV0/" target="_blank">康軒小一首冊注音</a></li>
-    </ul>
+    <!-- 固定標題 -->
+    <header>
+        <h1>學習資源總整理</h1>
+    </header>
 
-    <h2>英文學習</h2>
-    <ul>
-        <li><a href="https://guaelves.github.io/LearnEng/220sightwords/" target="_blank">220 Sight Words</a></li>
-        <li><a href="https://guaelves.github.io/LearnEng/CVC/" target="_blank">CVC</a></li>
-    </ul>
+    <!-- 左側懸浮選單 -->
+    <div class="sidebar">
+        <h2 class="red" data-target="kxv">康軒國語</h2>
+        <h2 class="orange" data-target="eng">英文學習</h2>
+        <h2 class="yellow" data-target="math">數學學習</h2>
+        <h2 class="green" data-target="bpmf">注音學習</h2>
+        <h2 class="blue" data-target="jp">日文學習</h2>
+        <h2 class="purple" data-target="game">圍棋小遊戲</h2>
+    </div>
 
-    <h2>數學學習</h2>
-    <ul>
-        <li><a href="https://guaelves.github.io/Math/9981/" target="_blank">九九乘法表 (9981)</a></li>
-        <li><a href="https://guaelves.github.io/Math/Cat/" target="_blank">數學遊戲 (Dudu)</a></li>
-    </ul>
+    <!-- 右側內容 -->
+    <div class="content">
 
-    <h2>注音學習</h2>
-    <ul>
-        <li><a href="https://guaelves.github.io/Bopomofo/bopomofo.html" target="_blank">注音符號</a></li>
-    </ul>
+        <div id="kxv" class="content-section">
+            <ul>
+                <li><a href="https://guaelves.github.io/KXV/KXV0/" target="_blank">康軒小一首冊注音</a></li>
+            </ul>
+        </div>
 
-    <h2>日文學習</h2>
-    <ul>
-        <li><a href="https://guaelves.github.io/Japanese/50/" target="_blank">日文五十音</a></li>
-    </ul>
+        <div id="eng" class="content-section">
+            <ul>
+                <li><a href="https://guaelves.github.io/LearnEng/220sightwords/" target="_blank">220 Sight Words</a></li>
+                <li><a href="https://guaelves.github.io/LearnEng/CVC/" target="_blank">CVC</a></li>
+            </ul>
+        </div>
 
-    <h2>圍棋小遊戲</h2>
-    <ul>
-        <li><a href="https://guaelves.github.io/Game/goai.html" target="_blank">圍棋Go</a></li>
-    </ul>
+        <div id="math" class="content-section">
+            <ul>
+                <li><a href="https://guaelves.github.io/Math/9981/" target="_blank">九九乘法表</a></li>
+            </ul>
+        </div>
 
-    
-  <footer>
-    @2025 guaelves. All rights reserved.
-  </footer>
-    
+        <div id="bpmf" class="content-section">
+            <ul>
+                <li><a href="https://guaelves.github.io/Bopomofo/bopomofo.html" target="_blank">注音符號</a></li>
+            </ul>
+        </div>
+
+        <div id="jp" class="content-section">
+            <ul>
+                <li><a href="https://guaelves.github.io/Japanese/50/" target="_blank">日文五十音</a></li>
+            </ul>
+        </div>
+
+        <div id="game" class="content-section">
+            <ul>
+                <li><a href="https://guaelves.github.io/Game/goai.html" target="_blank">圍棋Go</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 固定底部版權 -->
+    <footer>
+        @2025 guaelves. All rights reserved.
+    </footer>
+
+    <script>
+        const headers = document.querySelectorAll('.sidebar h2');
+        const sections = document.querySelectorAll('.content-section');
+        const content = document.querySelector('.content');
+
+        headers.forEach(header => {
+            header.addEventListener('mouseover', () => {
+                content.classList.add('dimmed');
+            });
+            header.addEventListener('mouseout', () => {
+                content.classList.remove('dimmed');
+            });
+            header.addEventListener('click', () => {
+                const targetId = header.getAttribute('data-target');
+                sections.forEach(section => {
+                    if(section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            sections[0].classList.add('active');
+        });
+    </script>
+
 </body>
 </html>
