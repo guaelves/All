@@ -34,16 +34,18 @@
         background: rgba(255, 255, 255, 0.5);
         backdrop-filter: blur(10px);
         border-radius: 0 20px 20px 0;
+        word-break: break-word; /* 防止文字溢出 */
     }
 
     .sidebar h2 {
-        font-size: clamp(24px, 6vw, 36px); /* 調大文字 */
+        font-size: clamp(24px, 6vw, 36px);
         margin: 0 0 10px 0;
         padding: 1rem 1.2rem;
         cursor: pointer;
         color: #000;
         border-radius: 0 20px 20px 0;
         transition: transform 0.3s, color 0.3s, background 0.3s;
+        white-space: normal; /* 自動換行 */
     }
 
     .sidebar h2:hover {
@@ -76,7 +78,8 @@
     header h1 {
         color: #005599;
         margin: 0;
-        font-size: clamp(30px, 8vw, 60px); /* 放大標題 */
+        font-size: clamp(30px, 8vw, 60px);
+        word-break: break-word; /* 自動換行 */
     }
 
     /* 右側內容 */
@@ -88,8 +91,9 @@
         min-height: calc(100vh - var(--header-height) - var(--footer-height));
         transition: background 0.3s;
         padding-bottom: calc(var(--footer-height) + 2rem);
-        font-size: clamp(22px, 6vw, 40px); /* 放大內容文字 */
+        font-size: clamp(22px, 6vw, 40px);
         line-height: 1.6;
+        word-break: break-word; /* 防止內容文字溢出 */
     }
 
     .content.dimmed {
@@ -116,13 +120,14 @@
     }
 
     li {
-        margin: 20px 0; /* 增加間距 */
+        margin: 20px 0;
     }
 
     a {
         text-decoration: none;
         color: #0066cc;
-        font-size: clamp(22px, 6vw, 40px); /* 放大連結文字 */
+        font-size: clamp(22px, 6vw, 40px);
+        word-break: break-word;
     }
 
     a:hover {
@@ -136,7 +141,7 @@
         left: 50%;
         transform: translateX(-50%);
         color: #777;
-        font-size: clamp(16px, 3vw, 22px); /* 放大 footer */
+        font-size: clamp(16px, 3vw, 22px);
         z-index: 1000;
         background: rgba(255, 255, 255, 0.7);
         padding: 0.5rem 1.5rem;
@@ -145,6 +150,32 @@
         height: var(--footer-height);
         line-height: var(--footer-height);
         white-space: nowrap;
+    }
+
+    /* 手機或小螢幕自適應 */
+    @media screen and (max-width: 768px) {
+        .sidebar {
+            width: clamp(120px, 25vw, 180px);
+            padding-top: 0.5rem;
+        }
+        .sidebar h2 {
+            font-size: clamp(20px, 5vw, 28px);
+            padding: 0.8rem 1rem;
+        }
+        header {
+            padding-left: calc(var(--sidebar-width) + 0.5rem);
+        }
+        header h1 {
+            font-size: clamp(24px, 6vw, 40px);
+        }
+        .content {
+            margin-left: var(--sidebar-width);
+            padding: 1rem;
+            font-size: clamp(20px, 5vw, 36px);
+        }
+        a {
+            font-size: clamp(20px, 5vw, 36px);
+        }
     }
 </style>
 </head>
