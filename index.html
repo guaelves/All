@@ -5,7 +5,7 @@
 <title>學習資源總整理</title>
 <style>
     :root {
-        --sidebar-width: clamp(180px, 20vw, 250px);
+        --sidebar-width: clamp(150px, 15vw, 250px);
         --header-height: clamp(50px, 6vh, 80px);
         --footer-height: clamp(40px, 5vh, 60px);
     }
@@ -34,6 +34,7 @@
         background: rgba(255, 255, 255, 0.5);
         backdrop-filter: blur(10px);
         border-radius: 0 20px 20px 0;
+        word-break: break-word; /* 防止文字溢出 */
     }
 
     .sidebar h2 {
@@ -44,11 +45,7 @@
         color: #000;
         border-radius: 0 20px 20px 0;
         transition: transform 0.3s, color 0.3s, background 0.3s;
-
-        white-space: nowrap;       /* 不換行 */
-        overflow: hidden;          /* 超出部分隱藏 */
-        text-overflow: ellipsis;   /* 超出部分顯示省略號 */
-        min-width: 150px;          /* 確保至少能顯示5個中文字 */
+        white-space: normal; /* 自動換行 */
     }
 
     .sidebar h2:hover {
@@ -56,7 +53,6 @@
         color: #333;
     }
 
-    /* 漸層顏色 */
     .red { background: linear-gradient(90deg, rgba(255,205,210,0.7), rgba(255,138,128,0.7)); }
     .orange { background: linear-gradient(90deg, rgba(255,224,178,0.7), rgba(255,183,77,0.7)); }
     .yellow { background: linear-gradient(90deg, rgba(255,249,196,0.7), rgba(255,241,118,0.7)); }
@@ -82,7 +78,8 @@
     header h1 {
         color: #005599;
         margin: 0;
-        font-size: clamp(20px, 3vw, 36px);
+        font-size: clamp(30px, 8vw, 60px);
+        word-break: break-word; /* 自動換行 */
     }
 
     /* 右側內容 */
@@ -94,8 +91,9 @@
         min-height: calc(100vh - var(--header-height) - var(--footer-height));
         transition: background 0.3s;
         padding-bottom: calc(var(--footer-height) + 2rem);
-        font-size: clamp(18px, 2.5vw, 32px);
+        font-size: clamp(22px, 6vw, 40px);
         line-height: 1.6;
+        word-break: break-word; /* 防止內容文字溢出 */
     }
 
     .content.dimmed {
@@ -122,13 +120,14 @@
     }
 
     li {
-        margin: 15px 0;
+        margin: 20px 0;
     }
 
     a {
         text-decoration: none;
         color: #0066cc;
-        font-size: clamp(18px, 2.5vw, 32px);
+        font-size: clamp(22px, 6vw, 40px);
+        word-break: break-word;
     }
 
     a:hover {
@@ -142,7 +141,7 @@
         left: 50%;
         transform: translateX(-50%);
         color: #777;
-        font-size: clamp(14px, 1.5vw, 18px);
+        font-size: clamp(16px, 3vw, 22px);
         z-index: 1000;
         background: rgba(255, 255, 255, 0.7);
         padding: 0.5rem 1.5rem;
@@ -152,90 +151,105 @@
         line-height: var(--footer-height);
         white-space: nowrap;
     }
+
+    /* 手機或小螢幕自適應 */
+    @media screen and (max-width: 768px) {
+        .sidebar {
+            width: clamp(120px, 25vw, 180px);
+            padding-top: 0.5rem;
+        }
+        .sidebar h2 {
+            font-size: clamp(20px, 5vw, 28px);
+            padding: 0.8rem 1rem;
+        }
+        header {
+            padding-left: calc(var(--sidebar-width) + 0.5rem);
+        }
+        header h1 {
+            font-size: clamp(24px, 6vw, 40px);
+        }
+        .content {
+            margin-left: var(--sidebar-width);
+            padding: 1rem;
+            font-size: clamp(20px, 5vw, 36px);
+        }
+        a {
+            font-size: clamp(20px, 5vw, 36px);
+        }
+    }
 </style>
 </head>
 <body>
 
-    <header>
-        <h1>學習資源總整理</h1>
-    </header>
+<header>
+    <h1>學習資源總整理</h1>
+</header>
 
-    <div class="sidebar">
-        <h2 class="red" data-target="kxv">康軒國語</h2>
-        <h2 class="orange" data-target="eng">英文學習</h2>
-        <h2 class="yellow" data-target="math">數學學習</h2>
-        <h2 class="green" data-target="bpmf">注音學習</h2>
-        <h2 class="blue" data-target="jp">日文學習</h2>
-        <h2 class="purple" data-target="game">圍棋小遊戲</h2>
+<div class="sidebar">
+    <h2 class="red" data-target="kxv">康軒國語</h2>
+    <h2 class="orange" data-target="eng">英文學習</h2>
+    <h2 class="yellow" data-target="math">數學學習</h2>
+    <h2 class="green" data-target="bpmf">注音學習</h2>
+    <h2 class="blue" data-target="jp">日文學習</h2>
+    <h2 class="purple" data-target="game">圍棋小遊戲</h2>
+</div>
+
+<div class="content">
+    <div id="kxv" class="content-section">
+        <ul>
+            <li><a href="https://guaelves.github.io/KXV/KXV0/" target="_blank">康軒小一首冊注音</a></li>
+        </ul>
     </div>
-
-    <div class="content">
-        <div id="kxv" class="content-section">
-            <ul>
-                <li><a href="https://guaelves.github.io/KXV/KXV0/" target="_blank">康軒小一首冊注音</a></li>
-            </ul>
-        </div>
-
-        <div id="eng" class="content-section">
-            <ul>
-                <li><a href="https://guaelves.github.io/LearnEng/220sightwords/" target="_blank">220 Sight Words</a></li>
-                <li><a href="https://guaelves.github.io/LearnEng/CVC/" target="_blank">CVC</a></li>
-            </ul>
-        </div>
-
-        <div id="math" class="content-section">
-            <ul>
-                <li><a href="https://guaelves.github.io/Math/9981/" target="_blank">九九乘法表</a></li>
-            </ul>
-        </div>
-
-        <div id="bpmf" class="content-section">
-            <ul>
-                <li><a href="https://guaelves.github.io/Bopomofo/bopomofo.html" target="_blank">注音符號</a></li>
-            </ul>
-        </div>
-
-        <div id="jp" class="content-section">
-            <ul>
-                <li><a href="https://guaelves.github.io/Japanese/50/" target="_blank">日文五十音</a></li>
-            </ul>
-        </div>
-
-        <div id="game" class="content-section">
-            <ul>
-                <li><a href="https://guaelves.github.io/Game/goai.html" target="_blank">圍棋Go</a></li>
-            </ul>
-        </div>
+    <div id="eng" class="content-section">
+        <ul>
+            <li><a href="https://guaelves.github.io/LearnEng/220sightwords/" target="_blank">220 Sight Words</a></li>
+            <li><a href="https://guaelves.github.io/LearnEng/CVC/" target="_blank">CVC</a></li>
+        </ul>
     </div>
+    <div id="math" class="content-section">
+        <ul>
+            <li><a href="https://guaelves.github.io/Math/9981/" target="_blank">九九乘法表</a></li>
+        </ul>
+    </div>
+    <div id="bpmf" class="content-section">
+        <ul>
+            <li><a href="https://guaelves.github.io/Bopomofo/bopomofo.html" target="_blank">注音符號</a></li>
+        </ul>
+    </div>
+    <div id="jp" class="content-section">
+        <ul>
+            <li><a href="https://guaelves.github.io/Japanese/50/" target="_blank">日文五十音</a></li>
+        </ul>
+    </div>
+    <div id="game" class="content-section">
+        <ul>
+            <li><a href="https://guaelves.github.io/Game/goai.html" target="_blank">圍棋Go</a></li>
+        </ul>
+    </div>
+</div>
 
-    <footer>
-        @2025 guaelves. All rights reserved.
-    </footer>
+<footer>
+    @2025 guaelves. All rights reserved.
+</footer>
 
-    <script>
-        const headers = document.querySelectorAll('.sidebar h2');
-        const sections = document.querySelectorAll('.content-section');
-        const content = document.querySelector('.content');
+<script>
+    const headers = document.querySelectorAll('.sidebar h2');
+    const sections = document.querySelectorAll('.content-section');
+    const content = document.querySelector('.content');
 
-        headers.forEach(header => {
-            header.addEventListener('mouseover', () => {
-                content.classList.add('dimmed');
-            });
-            header.addEventListener('mouseout', () => {
-                content.classList.remove('dimmed');
-            });
-            header.addEventListener('click', () => {
-                const targetId = header.getAttribute('data-target');
-                sections.forEach(section => {
-                    section.classList.toggle('active', section.id === targetId);
-                });
-            });
+    headers.forEach(header => {
+        header.addEventListener('mouseover', () => content.classList.add('dimmed'));
+        header.addEventListener('mouseout', () => content.classList.remove('dimmed'));
+        header.addEventListener('click', () => {
+            const targetId = header.getAttribute('data-target');
+            sections.forEach(section => section.classList.toggle('active', section.id === targetId));
         });
+    });
 
-        window.addEventListener('DOMContentLoaded', () => {
-            sections[0].classList.add('active');
-        });
-    </script>
+    window.addEventListener('DOMContentLoaded', () => {
+        sections[0].classList.add('active');
+    });
+</script>
 
 </body>
 </html>
