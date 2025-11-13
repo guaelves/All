@@ -4,254 +4,228 @@
 <meta charset="UTF-8">
 <title>學習資源總整理</title>
 <style>
-    :root {
-        --sidebar-width: clamp(150px, 15vw, 250px);
-        --header-height: clamp(50px, 6vh, 80px);
-        --footer-height: clamp(40px, 5vh, 60px);
-    }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: "Microsoft JhengHei", sans-serif;
+  background: radial-gradient(circle at center, #0b0f1a 0%, #000 100%);
+  color: #fff;
+}
 
-    body {
-        font-family: "Microsoft JhengHei", sans-serif;
-        margin: 0;
-        background-color: #f9f9f9;
-        color: #333;
-        display: flex;
-        transition: background 0.3s;
-    }
+/* 標題 */
+header {
+  position: absolute;
+  top: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #00e5ff;
+  font-size: clamp(26px, 4vw, 48px);
+  letter-spacing: 2px;
+}
 
-    /* 左側懸浮選單 */
-    .sidebar {
-        position: fixed;
-        top: var(--header-height);
-        left: 0;
-        width: var(--sidebar-width);
-        height: calc(100vh - var(--header-height));
-        display: flex;
-        flex-direction: column;
-        padding-top: 1rem;
-        z-index: 1000;
-        overflow-y: auto;
-        background: rgba(255, 255, 255, 0.5);
-        backdrop-filter: blur(10px);
-        border-radius: 0 20px 20px 0;
-        word-break: break-word; /* 防止文字溢出 */
-    }
+/* 左側主題欄 */
+.sidebar {
+  position: absolute;
+  top: 12%;
+  left: 4%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  z-index: 10;
+}
 
-    .sidebar h2 {
-        font-size: clamp(24px, 6vw, 36px);
-        margin: 0 0 10px 0;
-        padding: 1rem 1.2rem;
-        cursor: pointer;
-        color: #000;
-        border-radius: 0 20px 20px 0;
-        transition: transform 0.3s, color 0.3s, background 0.3s;
-        white-space: normal; /* 自動換行 */
-    }
+.sidebar h2 {
+  cursor: pointer;
+  font-size: clamp(18px, 2vw, 28px);
+  color: #ccc;
+  background: rgba(255,255,255,0.05);
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
 
-    .sidebar h2:hover {
-        transform: scale(1.05);
-        color: #333;
-    }
+.sidebar h2:hover, .sidebar h2.active {
+  color: #00e5ff;
+  background: rgba(0,229,255,0.15);
+}
 
-    .red { background: linear-gradient(90deg, rgba(255,205,210,0.7), rgba(255,138,128,0.7)); }
-    .orange { background: linear-gradient(90deg, rgba(255,224,178,0.7), rgba(255,183,77,0.7)); }
-    .yellow { background: linear-gradient(90deg, rgba(255,249,196,0.7), rgba(255,241,118,0.7)); }
-    .green { background: linear-gradient(90deg, rgba(220,237,200,0.7), rgba(174,213,129,0.7)); }
-    .blue { background: linear-gradient(90deg, rgba(187,222,251,0.7), rgba(100,181,246,0.7)); }
-    .purple { background: linear-gradient(90deg, rgba(225,190,231,0.7), rgba(186,104,200,0.7)); }
+/* 節點 */
+.node {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  color: #00e5ff;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.5s ease;
+  font-size: clamp(16px, 2vw, 22px);
+  z-index: 5;
+}
 
-    /* 固定頂部標題 */
-    header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: var(--header-height);
-        background-color: #fff;
-        display: flex;
-        align-items: center;
-        padding-left: calc(var(--sidebar-width) + 1rem);
-        z-index: 999;
-        box-shadow: none;
-    }
+.node.active {
+  opacity: 1;
+  transform: scale(1);
+  box-shadow: 0 0 20px rgba(0,229,255,0.4);
+}
 
-    header h1 {
-        color: #005599;
-        margin: 0;
-        font-size: clamp(30px, 8vw, 60px);
-        word-break: break-word; /* 自動換行 */
-    }
+.node a {
+  color: #00e5ff;
+  text-decoration: none;
+}
 
-    /* 右側內容 */
-    .content {
-        margin-left: var(--sidebar-width);
-        margin-top: var(--header-height);
-        padding: 2rem;
-        flex: 1;
-        min-height: calc(100vh - var(--header-height) - var(--footer-height));
-        transition: background 0.3s;
-        padding-bottom: calc(var(--footer-height) + 2rem);
-        font-size: clamp(22px, 6vw, 40px);
-        line-height: 1.6;
-        word-break: break-word; /* 防止內容文字溢出 */
-    }
+.node a:hover {
+  text-decoration: underline;
+}
 
-    .content.dimmed {
-        background-color: rgba(249, 249, 249, 0.6);
-    }
+/* SVG 線條層 */
+svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none; /* 點擊不擋連結 */
+}
 
-    .content-section {
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        transform: translateX(50px);
-        transition: all 0.5s ease;
-    }
+/* 線條樣式與動畫 */
+.path-line {
+  stroke: url(#gradLine);
+  stroke-width: 2.5;
+  fill: none;
+  stroke-dasharray: 6 10;
+  animation: flow 2s linear infinite;
+}
 
-    .content-section.active {
-        max-height: 2000px;
-        opacity: 1;
-        transform: translateX(0);
-    }
+@keyframes flow {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
 
-    ul {
-        list-style: none;
-        padding-left: 0;
-    }
-
-    li {
-        margin: 20px 0;
-    }
-
-    a {
-        text-decoration: none;
-        color: #0066cc;
-        font-size: clamp(22px, 6vw, 40px);
-        word-break: break-word;
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-
-    /* 固定底部版權文字 */
-    footer {
-        position: fixed;
-        bottom: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        color: #777;
-        font-size: clamp(16px, 3vw, 22px);
-        z-index: 1000;
-        background: rgba(255, 255, 255, 0.7);
-        padding: 0.5rem 1.5rem;
-        border-radius: 10px;
-        backdrop-filter: blur(6px);
-        height: var(--footer-height);
-        line-height: var(--footer-height);
-        white-space: nowrap;
-    }
-
-    /* 手機或小螢幕自適應 */
-    @media screen and (max-width: 768px) {
-        .sidebar {
-            width: clamp(120px, 25vw, 180px);
-            padding-top: 0.5rem;
-        }
-        .sidebar h2 {
-            font-size: clamp(20px, 5vw, 28px);
-            padding: 0.8rem 1rem;
-        }
-        header {
-            padding-left: calc(var(--sidebar-width) + 0.5rem);
-        }
-        header h1 {
-            font-size: clamp(24px, 6vw, 40px);
-        }
-        .content {
-            margin-left: var(--sidebar-width);
-            padding: 1rem;
-            font-size: clamp(20px, 5vw, 36px);
-        }
-        a {
-            font-size: clamp(20px, 5vw, 36px);
-        }
-    }
+/* 版權 */
+footer {
+  position: absolute;
+  bottom: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #888;
+  font-size: clamp(14px, 2vw, 18px);
+}
 </style>
 </head>
 <body>
 
-<header>
-    <h1>學習資源總整理</h1>
-</header>
+<header>學習資源總整理</header>
 
 <div class="sidebar">
-    <h2 class="red" data-target="kxv">康軒國語</h2>
-    <h2 class="orange" data-target="eng">英文學習</h2>
-    <h2 class="yellow" data-target="math">數學學習</h2>
-    <h2 class="green" data-target="bpmf">注音學習</h2>
-    <h2 class="blue" data-target="jp">日文學習</h2>
-    <h2 class="purple" data-target="game">圍棋小遊戲</h2>
+  <h2 data-topic="kxv">康軒國語</h2>
+  <h2 data-topic="eng">英文學習</h2>
+  <h2 data-topic="math">數學學習</h2>
+  <h2 data-topic="bpmf">注音學習</h2>
+  <h2 data-topic="jp">日文學習</h2>
+  <h2 data-topic="game">圍棋小遊戲</h2>
 </div>
 
-<div class="content">
-    <div id="kxv" class="content-section">
-        <ul>
-            <li><a href="https://guaelves.github.io/KXV/KXV0/" target="_blank">康軒小一首冊注音</a></li>
-        </ul>
-    </div>
-    <div id="eng" class="content-section">
-        <ul>
-            <li><a href="https://guaelves.github.io/LearnEng/220sightwords/" target="_blank">220 Sight Words</a></li>
-            <li><a href="https://guaelves.github.io/LearnEng/CVC/" target="_blank">CVC</a></li>
-        </ul>
-    </div>
-    <div id="math" class="content-section">
-        <ul>
-            <li><a href="https://guaelves.github.io/Math/9981/" target="_blank">九九乘法表</a></li>
-        </ul>
-    </div>
-    <div id="bpmf" class="content-section">
-        <ul>
-            <li><a href="https://guaelves.github.io/Bopomofo/bopomofo.html" target="_blank">注音符號</a></li>
-            <li><a href="https://guaelves.github.io/Bopomofo/friendsgroup/" target="_blank">注音好朋友</a></li>
-            <li><a href="https://guaelves.github.io/Bopomofo/friendsgroup2/" target="_blank">注音好朋友2</a></li>
-           
-        </ul>
-    </div>
-    <div id="jp" class="content-section">
-        <ul>
-            <li><a href="https://guaelves.github.io/Japanese/50/" target="_blank">日文五十音</a></li>
-        </ul>
-    </div>
-    <div id="game" class="content-section">
-        <ul>
-            <li><a href="https://guaelves.github.io/Game/goai.html" target="_blank">圍棋Go</a></li>
-        </ul>
-    </div>
-</div>
+<!-- SVG 畫線 -->
+<svg id="lines">
+  <defs>
+    <!-- 閃光漸層 -->
+    <linearGradient id="gradLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.2" />
+      <stop offset="50%" stop-color="#00e5ff" stop-opacity="1" />
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+</svg>
 
-<footer>
-    @2025 guaelves. All rights reserved.
-</footer>
+<footer>@2025 guaelves. All rights reserved.</footer>
 
 <script>
-    const headers = document.querySelectorAll('.sidebar h2');
-    const sections = document.querySelectorAll('.content-section');
-    const content = document.querySelector('.content');
+/* 主題與連結資料 */
+const topics = {
+  kxv: [
+    { text: "康軒小一首冊注音", url: "https://guaelves.github.io/KXV/KXV0/" }
+  ],
+  eng: [
+    { text: "220 Sight Words", url: "https://guaelves.github.io/LearnEng/220sightwords/" },
+    { text: "CVC 練習", url: "https://guaelves.github.io/LearnEng/CVC/" }
+  ],
+  math: [
+    { text: "九九乘法表", url: "https://guaelves.github.io/Math/9981/" }
+  ],
+  bpmf: [
+    { text: "注音符號", url: "https://guaelves.github.io/Bopomofo/bopomofo.html" },
+    { text: "注音好朋友", url: "https://guaelves.github.io/Bopomofo/friendsgroup/" },
+    { text: "注音好朋友2", url: "https://guaelves.github.io/Bopomofo/friendsgroup2/" }
+  ],
+  jp: [
+    { text: "日文五十音", url: "https://guaelves.github.io/Japanese/50/" }
+  ],
+  game: [
+    { text: "圍棋Go", url: "https://guaelves.github.io/Game/goai.html" }
+  ]
+};
 
-    headers.forEach(header => {
-        header.addEventListener('mouseover', () => content.classList.add('dimmed'));
-        header.addEventListener('mouseout', () => content.classList.remove('dimmed'));
-        header.addEventListener('click', () => {
-            const targetId = header.getAttribute('data-target');
-            sections.forEach(section => section.classList.toggle('active', section.id === targetId));
-        });
-    });
+const svg = document.getElementById("lines");
+const sidebar = document.querySelector(".sidebar");
 
-    window.addEventListener('DOMContentLoaded', () => {
-        sections[0].classList.add('active');
+/* 清除舊節點與線條 */
+function clearGraph() {
+  document.querySelectorAll(".node").forEach(n => n.remove());
+  svg.querySelectorAll("path").forEach(p => p.remove());
+  document.querySelectorAll(".sidebar h2").forEach(h => h.classList.remove("active"));
+}
+
+/* 主題點擊事件 */
+sidebar.querySelectorAll("h2").forEach(h2 => {
+  h2.addEventListener("click", () => {
+    clearGraph();
+    h2.classList.add("active");
+
+    const topic = topics[h2.dataset.topic];
+    if (!topic) return;
+
+    const rect = h2.getBoundingClientRect();
+    const svgRect = svg.getBoundingClientRect();
+    const startX = rect.right - svgRect.left;
+    const startY = rect.top + rect.height / 2 - svgRect.top;
+
+    // 根據螢幕寬度動態調整節點距離
+    const screenW = window.innerWidth;
+    const baseX = screenW * 0.45; // 節點不會太右
+    const baseY = window.innerHeight / 3;
+    const spacing = Math.min(120, window.innerHeight / 6);
+
+    topic.forEach((item, i) => {
+      const nodeX = baseX;
+      const nodeY = baseY + i * spacing;
+
+      // 建立節點
+      const node = document.createElement("div");
+      node.classList.add("node");
+      node.style.left = `${nodeX}px`;
+      node.style.top = `${nodeY}px`;
+      node.innerHTML = `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.text}</a>`;
+      document.body.appendChild(node);
+
+      setTimeout(() => node.classList.add("active"), 100 + i * 150);
+
+      // L 型線條
+      const midX = (startX + nodeX) / 2;
+      const pathData = `M${startX},${startY} L${midX},${startY} L${midX},${nodeY} L${nodeX},${nodeY}`;
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", pathData);
+      path.setAttribute("class", "path-line");
+      svg.appendChild(path);
     });
+  });
+});
 </script>
 
 </body>
